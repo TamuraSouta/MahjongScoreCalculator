@@ -65,10 +65,11 @@ else:
 player_names = [f'プレイヤー{i+1}' for i in range(20)]
 selected_players = st.multiselect('プレイヤーを選択してください（3人または4人）', player_names)
 
-# スコア入力の初期化
-for player in player_names:
+# スコア入力の初期化と表示
+for player in selected_players:
     if player not in st.session_state:
         st.session_state[player] = 0
+    st.session_state[player] = st.number_input(f'{player}の点数', key=f'score_{player}', value=st.session_state[player])
 
 if st.button('点数を申請'):
     initial_points = 35000 if len(selected_players) == 3 else 25000
