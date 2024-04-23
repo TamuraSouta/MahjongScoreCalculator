@@ -28,7 +28,7 @@ def save_data(data, filepath):
     with open(filepath, 'wb') as f:
         pickle.dump(data, f)
 
-st.title('麻雀大会アプリ')
+st.title('麻雀アプリ')
 
 # データのロード
 if 'scores' not in st.session_state:
