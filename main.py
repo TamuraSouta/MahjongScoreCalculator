@@ -54,10 +54,19 @@ if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
 
 
-# 管理者ページ
+st.title('麻雀アプリ')
+
+if 'logged_in' not in st.session_state:
+    st.session_state['logged_in'] = False
+
 if st.session_state['logged_in']:
+    # 管理者ページ用のデータロード
+    if 'scores' not in st.session_state:
+        st.session_state['scores'] = load_data(FILE_PATH)
+    if 'pending_scores' not in st.session_state:
+        st.session_state['pending_scores'] = load_data(PENDING_PATH)
+        
     st.sidebar.title("管理者ページ")
-    
     game_ids = list(st.session_state['pending_scores'].keys())
     selected_game_id = st.sidebar.selectbox("試合IDを選択", game_ids)
     
@@ -67,18 +76,17 @@ if st.session_state['logged_in']:
         st.sidebar.text(scores_text)
         
         col1, col2 = st.sidebar.columns(2)
-        if col1.button("全て承認", key=f"approve_{selected_game_id}"):
-            for player, score_details in game_scores.items():
+        if col1.button("全て承認"):
+            for player, score_details in list(game_scores.items()):
                 input_score, adjusted_score, _ = score_details
                 st.session_state['scores'][player] = st.session_state['scores'].get(player, []) + [adjusted_score]
                 game_scores[player] = [input_score, adjusted_score, True]
-            del st.session_state['pending_scores'][selected_game_id]
             save_data(st.session_state['pending_scores'], PENDING_PATH)
             save_data(st.session_state['scores'], FILE_PATH)
             st.experimental_rerun()
-            
-        if col2.button("全て却下", key=f"reject_{selected_game_id}"):
-            del st.session_state['pending_scores'][selected_game_id]
+        
+        if col2.button("全て却下"):
+            st.session_state['pending_scores'].pop(selected_game_id, None)
             save_data(st.session_state['pending_scores'], PENDING_PATH)
             st.experimental_rerun()
 else:
@@ -88,6 +96,9 @@ else:
     if st.sidebar.button('ログイン'):
         if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
             st.session_state['logged_in'] = True
+            # ログイン成功時にデータをロード
+            st.session_state['scores'] = load_data(FILE_PATH)
+            st.session_state['pending_scores'] = load_data(PENDING_PATH)
         else:
             st.sidebar.error("ユーザー名またはパスワードが間違っています。")
 
