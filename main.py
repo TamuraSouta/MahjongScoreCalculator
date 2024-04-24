@@ -3,8 +3,6 @@ import os
 import pickle
 from datetime import datetime
 import random
-import asyncio
-
 
 # データを保存・読み込むためのファイルパス
 FILE_PATH = 'mahjong_scores.pkl'
@@ -46,22 +44,13 @@ def handle_score_rejection(player, game_id, pending_scores):
     save_data(pending_scores, PENDING_PATH)
 
 
-async def async_load_data(filepath):
-    if os.path.exists(filepath):
-        with open(filepath, 'rb') as f:
-            return pickle.load(f)
-    else:
-        return {}
-
+# データの初期ロード
+if 'scores' not in st.session_state:
+    st.session_state['scores'] = load_data(FILE_PATH)
+if 'pending_scores' not in st.session_state:
+    st.session_state['pending_scores'] = load_data(PENDING_PATH)
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
-    st.session_state['data_loaded'] = False
-
-if st.session_state['logged_in'] and not st.session_state['data_loaded']:
-    scores_future = asyncio.ensure_future(async_load_data(FILE_PATH))
-    pending_scores_future = asyncio.ensure_future(async_load_data(PENDING_PATH))
-    st.session_state['scores'], st.session_state['pending_scores'] = await asyncio.gather(scores_future, pending_scores_future)
-    st.session_state['data_loaded'] = True
 
 
 st.title('麻雀アプリ')
