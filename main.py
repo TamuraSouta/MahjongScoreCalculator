@@ -4,7 +4,6 @@ import pickle
 from datetime import datetime
 import random
 
-st.write("スコアデータ:", scores)
+st.write("スコアデータ:")
 
-# データ表示
-st.write("承認待ちスコアデータ:", pending_scores)
+
